@@ -1,43 +1,35 @@
 (function () {
-    var globalWs = null;
-    var errFlag = false;
+    var globalWs = null; 
     var wsAddr = 'ws://127.0.0.1:15577';
 	var lastSendMsg = "";
     var sendLrc = function (lrc) {
-        if (window.WebSocket) {
-            try {
-                var ws = globalWs;
-                if (!ws) {
-                    ws = new WebSocket(wsAddr);
-                } else if (ws.readyState == WebSocket.OPEN) {
-                    ws.send(JSON.stringify(lrc))
-                }
-                ws.onopen = function () {
-                    //注释掉，没打开就抛弃，避免一下连接成功推送很多歌词过去
-                    // ws.send(JSON.stringify(lrc))
-                };
-                ws.onmessage = function (e) {
-                    console.info(e.data);
-                };
-                ws.onerror = function () {
-                    if (!errFlag) {
-                        console.error("未安装或启动桌面歌词服务")
-                    }
-                    errFlag = true;
-                }
-                ws.onclose = function () {
-                    var ws2 = new WebSocket(wsAddr);
-                    ws2.onopen = ws.onopen
-                    ws2.onclose = ws.onclose
-                    ws2.onmessage = ws.onmessage;
-                    ws2.onerror = ws.onerror;
-                    ws = ws2;
-                    globalWs = ws;
-                }
-                globalWs = ws;
-            } catch (e) {
-                console.error('未安装或启动桌面歌词服务')
-            }
+        if (window.WebSocket) {            
+			var ws = globalWs;
+			if (!ws) {
+				ws = new WebSocket(wsAddr);
+			} else if (ws.readyState == WebSocket.OPEN) {
+				ws.send(JSON.stringify(lrc))
+			}
+			ws.onopen = function () {
+				//注释掉，没打开就抛弃，避免一下连接成功推送很多歌词过去
+				// ws.send(JSON.stringify(lrc))
+			};
+			ws.onmessage = function (e) {
+				console.info(e.data);
+			};
+			ws.onerror = function () { 
+				console.error("未安装或启动桌面歌词服务")			 
+			}
+			ws.onclose = function () {				 
+				var ws2 = new WebSocket(wsAddr);
+				ws2.onopen = ws.onopen
+				ws2.onclose = ws.onclose
+				ws2.onmessage = ws.onmessage;
+				ws2.onerror = ws.onerror;
+				ws = ws2;
+				globalWs = ws;			 
+			}
+			globalWs = ws;            
         } else {
             console.error('浏览器不支持websocket')
         }
@@ -104,6 +96,6 @@
         
     }
     window.setInterval(updateLrc, 500);
-    console.log('桌面歌词加载完毕')
+    console.log('桌面歌词插件加载完毕')
 
 })();
